@@ -1,0 +1,4 @@
+interface:
+  display_name: "Zeka Review Loop"
+  short_description: "Governed PR review and correction with SHA-bound evidence"
+  default_prompt: "Use $zeka-review-loop to review this PR within its approved scope and prepare evidence for Chief."
