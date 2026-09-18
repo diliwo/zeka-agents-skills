@@ -191,10 +191,40 @@ class GovernanceTests(unittest.TestCase):
                 self.assertIn(flag, outcome["active_stops"])
                 self.assertFalse(outcome["correction_authorized"])
 
-    def test_low_security_flag_is_not_automatic_stop(self):
+    def test_security_at_every_severity_blocks_generic_approval(self):
+        for severity in ("low", "medium", "high", "critical", "unknown"):
+            with self.subTest(severity=severity):
+                f = finding()
+                f["severity"] = severity
+                f["flags"]["security"] = True
+                outcome = assess(f, cfg(), A)
+                self.assertIn("security", outcome["active_stops"])
+                self.assertFalse(outcome["correction_authorized"])
+
+    def test_low_security_requires_current_scoped_adjudication(self):
         f = finding()
         f["flags"]["security"] = True
+        f["adjudication"] = {"by": "Chief", "ref": "security-review", "scope_ref": "scope-1",
+                             "head_sha": A, "cleared_stops": ["security"]}
         self.assertTrue(assess(f, cfg(), A)["correction_authorized"])
+        for key, value in (("by", "Greptile"), ("ref", ""), ("scope_ref", "other-scope"),
+                           ("head_sha", B), ("cleared_stops", [])):
+            with self.subTest(key=key):
+                invalid = copy.deepcopy(f)
+                invalid["adjudication"][key] = value
+                outcome = assess(invalid, cfg(), A)
+                self.assertIn("security", outcome["active_stops"])
+                self.assertFalse(outcome["correction_authorized"])
+        f["flags"]["authorization"] = True
+        self.assertFalse(assess(f, cfg(), A)["correction_authorized"])
+
+    def test_low_security_adjudication_does_not_replace_fix_approval(self):
+        f = finding()
+        f["flags"]["security"] = True
+        f["adjudication"] = {"by": "Chief", "ref": "security-review", "scope_ref": "scope-1",
+                             "head_sha": A, "cleared_stops": ["security"]}
+        f.pop("decision")
+        self.assertFalse(assess(f, cfg(), A)["correction_authorized"])
 
     def test_reproduction_cannot_be_waived(self):
         f = finding()

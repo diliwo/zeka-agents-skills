@@ -17,7 +17,9 @@ Zeka uses Chief-adjudicated findings and exact-SHA evidence rather than a confid
 target or zero unresolved threads. It separates software/platform ownership, requires
 consequential decisions outside autonomous correction, preserves finding history, and
 leaves final review/merge authority outside the loop. The default cap is three reviews,
-including fresh verification of the final correction. GitHub-only helpers keep transport
+including fresh verification of the final correction; see the
+[budget rationale](execution.md) for counting, tradeoffs and configuration.
+GitHub-only helpers keep transport
 behavior small and auditable.
 
 Primary API references:

@@ -14,7 +14,7 @@ owners. Mixed or uncertain ownership needs adjudication and an explicit handoff.
 
 Stop the correction phase for any of:
 
-- Medium/High/Critical security sensitivity; unknown security severity is also a stop.
+- Security sensitivity at every severity, including Low and unknown.
 - Tenant isolation, authorization, data integrity, material persistence/transactional
   semantics, runtime privileges, accepted ADR/architecture boundaries.
 - Issue/PR scope expansion, a newly revealed cross-service contract, or conflicting
@@ -24,6 +24,12 @@ Stop the correction phase for any of:
 Report the finding, reproduction attempt, conflicting contracts where applicable, current
 SHA, owner, and precise decision needed. Keep private decision sources as configurable
 references; do not copy their contents into this skill or public reports.
+
+A Low-security label estimates impact; it does not establish that the proposed fix is
+safe or authorized. Security-sensitive corrections therefore require explicit Chief
+adjudication even with a generic fix approval. This removes the Low-severity exemption.
+Clearing `security` does not clear coexisting stops such as authorization or runtime
+privileges; each must be adjudicated independently.
 
 A finding's `decision` records Chief's disposition, blocking status, action, scope and
 the SHA at which correction is authorized. It is not supplied by Greptile. Mandatory
