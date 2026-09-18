@@ -51,8 +51,7 @@ def assess(finding, cfg, head):
     require(type(finding["reproduced"]) is bool, "reproduction must be explicit")
     require(finding["disposition"] in DISPOSITIONS, "invalid disposition")
     require(finding["state"] in ("open", "corrected", "dismissed", "deferred"), "invalid finding state")
-    stops = [key for key, value in finding["flags"].items()
-             if value and (key != "security" or finding["severity"] != "low")]
+    stops = [key for key, value in finding["flags"].items() if value]
     if not finding["reproduced"]:
         stops.append("cannot_reproduce")
     if finding["severity"] == "unknown" or finding["owner"] in ("unknown", "mixed"):

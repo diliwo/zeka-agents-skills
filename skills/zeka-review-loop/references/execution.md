@@ -32,6 +32,17 @@ Example configuration (replace placeholders and verify exact bot/app identities)
 }
 ```
 
+`max_iterations` defaults to 3 review iterations, counting the initial review and fresh
+verification reviews. This permits an initial assessment followed by up to two correction
+rounds, each verified by the next review. Three is a practical budget choice, not an
+empirically proven convergence threshold: it leaves room to catch defects introduced or
+revealed by the first correction while bounding external review latency, cost, and repeated
+rework. Stop earlier when ready or when a mandatory stop applies. At the cap, hand off
+remaining findings; never apply another correction without a reserved verification review
+or treat budget exhaustion as readiness. Set a different cap when establishing the bounded
+task if the authorized scope warrants it; do not reset the ledger or silently increase the
+cap to keep a stalled loop running.
+
 `apps_trigger` may be set to `@greptile-apps review` only after confirming that this
 installation supports it. Size-limit detection examines trusted review comments/check
 output for refusal text; do not infer a universal file-count threshold. The detector is
