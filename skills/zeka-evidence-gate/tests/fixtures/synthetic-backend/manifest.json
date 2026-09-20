@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "bundle_id": "synthetic-duplicate-delivery",
+  "created_at": "2026-09-20T10:00:00Z",
+  "synthetic": true,
+  "repository": "example/backend",
+  "branch": "fix/duplicate-delivery",
+  "head_sha": "1111111111111111111111111111111111111111",
+  "scope": "Demonstrate focused evidence and explicit gaps for duplicate event delivery.",
+  "contract_ref": {
+    "kind": "repository_contract",
+    "locator": "contract:duplicate-delivery",
+    "revision": "v1"
+  },
+  "required_targets": [
+    {
+      "id": "T-001",
+      "requirement": "Delivering the same event twice creates one durable effect.",
+      "level": "focused",
+      "class": "integration",
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-001"
+      }
+    },
+    {
+      "id": "T-002",
+      "requirement": "The complete regression suite passes.",
+      "level": "regression",
+      "class": "integration",
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-002"
+      }
+    },
+    {
+      "id": "T-003",
+      "requirement": "All required protected CI checks succeed at the target SHA.",
+      "level": "protected_ci",
+      "class": "ci",
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-003"
+      }
+    }
+  ],
+  "records": [
+    {
+      "id": "E-001",
+      "timestamp": "2026-09-20T10:00:00Z",
+      "repository": "example/backend",
+      "branch": "fix/duplicate-delivery",
+      "commit_sha": "1111111111111111111111111111111111111111",
+      "target_id": "T-001",
+      "requirement": "Delivering the same event twice creates one durable effect.",
+      "class": "integration",
+      "level": "focused",
+      "phase": "after",
+      "preconditions": [
+        "Disposable database initialized",
+        "Synthetic event fixture loaded"
+      ],
+      "environment": {
+        "os": "Linux",
+        "data": "synthetic",
+        "versions": [
+          {
+            "name": "dotnet",
+            "version": "10.0.100",
+            "kind": "runtime"
+          },
+          {
+            "name": "PostgreSQL",
+            "version": "17.0",
+            "kind": "service"
+          }
+        ]
+      },
+      "procedure": {
+        "argv": [
+          "dotnet",
+          "test",
+          "tests/Backend.IntegrationTests",
+          "--configuration",
+          "Release",
+          "--filter",
+          "FullyQualifiedName~DuplicateDelivery",
+          "--logger",
+          "trx"
+        ],
+        "working_directory": "."
+      },
+      "exit_code": 0,
+      "expected_result": {
+        "delivery_count": 2,
+        "durable_effect_count": 1
+      },
+      "observed_result": {
+        "delivery_count": 2,
+        "durable_effect_count": 1
+      },
+      "status": "passed",
+      "output_excerpt": "Synthetic example: one selected test passed; durable effect count was one.",
+      "artifact_ids": [
+        "A-001"
+      ],
+      "caveats": [
+        "Sequential duplicate delivery only; concurrent delivery remains untested."
+      ],
+      "provenance": {
+        "kind": "synthetic",
+        "metadata": {
+          "fixture": "synthetic-backend",
+          "description": "Invented demonstration; no backend or CI run was executed."
+        }
+      },
+      "details": {
+        "project": "tests/Backend.IntegrationTests",
+        "suite": "DuplicateDelivery",
+        "configuration": "Release",
+        "filter": "FullyQualifiedName~DuplicateDelivery",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "duration_ms": 420
+      },
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-001"
+      },
+      "versions": [
+        {
+          "name": "test-runner",
+          "version": "1.0.0",
+          "kind": "tool"
+        }
+      ]
+    },
+    {
+      "id": "E-002",
+      "timestamp": "2026-09-20T10:00:00Z",
+      "repository": "example/backend",
+      "branch": "fix/duplicate-delivery",
+      "commit_sha": "1111111111111111111111111111111111111111",
+      "target_id": "T-002",
+      "requirement": "The complete regression suite passes.",
+      "class": "integration",
+      "level": "regression",
+      "phase": "standalone",
+      "preconditions": [],
+      "environment": {
+        "os": "Linux",
+        "data": "synthetic",
+        "versions": [
+          {
+            "name": "dotnet",
+            "version": "10.0.100",
+            "kind": "runtime"
+          },
+          {
+            "name": "PostgreSQL",
+            "version": "17.0",
+            "kind": "service"
+          }
+        ]
+      },
+      "procedure": {
+        "steps": [
+          "Assess the synthetic demonstration target."
+        ],
+        "working_directory": "."
+      },
+      "exit_code": null,
+      "expected_result": {
+        "success": true
+      },
+      "observed_result": null,
+      "status": "untested",
+      "reason": "Not executed in this synthetic demonstration.",
+      "output_excerpt": "",
+      "artifact_ids": [],
+      "caveats": [],
+      "provenance": {
+        "kind": "synthetic",
+        "metadata": {
+          "fixture": "synthetic-backend",
+          "description": "Invented demonstration; no backend or CI run was executed."
+        }
+      },
+      "details": null,
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-002"
+      }
+    },
+    {
+      "id": "E-003",
+      "timestamp": "2026-09-20T10:00:00Z",
+      "repository": "example/backend",
+      "branch": "fix/duplicate-delivery",
+      "commit_sha": "1111111111111111111111111111111111111111",
+      "target_id": "T-003",
+      "requirement": "All required protected CI checks succeed at the target SHA.",
+      "class": "ci",
+      "level": "protected_ci",
+      "phase": "standalone",
+      "preconditions": [],
+      "environment": {
+        "os": "Linux",
+        "data": "synthetic",
+        "versions": [
+          {
+            "name": "dotnet",
+            "version": "10.0.100",
+            "kind": "runtime"
+          },
+          {
+            "name": "PostgreSQL",
+            "version": "17.0",
+            "kind": "service"
+          }
+        ]
+      },
+      "procedure": {
+        "steps": [
+          "Assess the synthetic demonstration target."
+        ],
+        "working_directory": "."
+      },
+      "exit_code": null,
+      "expected_result": {
+        "success": true
+      },
+      "observed_result": null,
+      "status": "blocked",
+      "reason": "This synthetic demonstration has no GitHub Actions run.",
+      "output_excerpt": "",
+      "artifact_ids": [],
+      "caveats": [],
+      "provenance": {
+        "kind": "synthetic",
+        "metadata": {
+          "fixture": "synthetic-backend",
+          "description": "Invented demonstration; no backend or CI run was executed."
+        }
+      },
+      "details": null,
+      "contract_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1"
+      },
+      "requirement_ref": {
+        "kind": "repository_contract",
+        "locator": "contract:duplicate-delivery",
+        "revision": "v1",
+        "fragment": "T-003"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "A-001",
+      "path": "results.json",
+      "media_type": "application/json",
+      "sha256": "3f5e033876620de3ed629e477ef07d7839b8af389ea610e5c4316c8d717d6467",
+      "role": "result",
+      "provenance": {
+        "kind": "synthetic",
+        "metadata": {
+          "fixture": "synthetic-backend",
+          "description": "Invented demonstration; no backend or CI run was executed."
+        }
+      },
+      "safety": {
+        "reviewed": true,
+        "method": "synthetic_fixture",
+        "review_ref": {
+          "kind": "document",
+          "locator": "fixture:synthetic-backend"
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "target_id": "T-001",
+      "before_id": null,
+      "after_id": "E-001",
+      "reason": "No historical failure exists: this is an invented demonstration, not a bug-fix claim."
+    }
+  ],
+  "caveats": [
+    "All revisions, measurements, and source details in this fixture are synthetic.",
+    "Regression and protected CI evidence remain incomplete.",
+    "Concurrent delivery and production behavior are not proved."
+  ]
+}
