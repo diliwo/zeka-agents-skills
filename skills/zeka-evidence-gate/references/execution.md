@@ -6,12 +6,15 @@ executed. Examples use repository-relative paths; substitute safe task-specific 
 ## Prepare and package
 
 1. Inventory requirements and collect authorized evidence using project tooling.
-2. Produce a sanitized candidate `manifest.json` and its referenced artifacts in a
+2. Reconcile runner skip counts with a structured inventory and declared targets.
+   Verify conditional skips against the recorded environment; required skipped scenarios
+   need explicit untested/blocked records. Never substitute prose caveats for this mapping.
+3. Produce a sanitized candidate `manifest.json` and its referenced artifacts in a
    private, ignored staging directory. Apply allowlisted export/redaction before disk
    capture. The helper does not consume raw logs to clean them afterward.
-3. Hash sanitized artifact bytes with SHA-256 and record structured source results.
-4. Ensure `.artifacts/` is ignored in the tested repository. Do not commit artifacts.
-5. Package into a new directory:
+4. Hash sanitized artifact bytes with SHA-256 and record structured source results.
+5. Ensure `.artifacts/` is ignored in the tested repository. Do not commit artifacts.
+6. Package into a new directory:
 
 ```text
 python skills/zeka-evidence-gate/scripts/evidence_gate.py init --input .artifacts/staging/manifest.json --output .artifacts/task-001 --repo .
@@ -71,7 +74,9 @@ to this repository/task; the helper does not fetch GitHub PR identity.
 Mapping: passed→passed, failed→failed, blocked→unavailable,
 untested→missing, absent level→missing. The export neither invents `not_required`
 waivers nor promotes incomplete evidence. It rejects synthetic, stale and offline-only
-evidence. Full required-check enumeration remains the collector's responsibility.
+evidence. Accounted expected skips outside a target's obligations do not change its
+passing status; required targets left untested/blocked by skips still map to
+missing/unavailable. Full required-check enumeration remains the collector's responsibility.
 
 ## Offline tests
 

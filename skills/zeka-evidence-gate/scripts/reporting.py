@@ -14,6 +14,41 @@ def text(value):
     return value.replace("\r", " ").replace("\n", " ")
 
 
+def skip_report(manifest):
+    """Expose skip accountability, including historical observations, in the report."""
+    records = [r for r in manifest["records"] if r["class"] in ("unit", "integration")
+               and r["details"] is not None and r["details"]["skipped"] > 0]
+    if not records:
+        return []  # Preserve existing zero-skip v1 reports byte-for-byte.
+    current = {r["target_id"]: r for r in manifest["records"] if r["phase"] != "before"}
+    lines = ["## Skipped tests", ""]
+    for record in records:
+        details = record["details"]
+        lines += ["### " + text(record["id"]) + " (" + record["phase"] + ")", "",
+                  f"Test counts: {details['passed']} passed / {details['failed']} failed / {details['skipped']} skipped.",
+                  "Accounted skips: " + str(len(details["skips"])),
+                  "Recorded OS: " + text(record["environment"]["os"]),
+                  "Recorded prerequisites: " + text(json.dumps(record["environment"].get("prerequisites", []), sort_keys=True)), ""]
+        for skip in details["skips"]:
+            historical = record["phase"] == "before"
+            if historical:
+                related = ", ".join(skip["target_ids"]) or "none (outside declared targets)"
+                effect = "Historical skips do not affect current completeness."
+            elif skip["target_ids"]:
+                related = ", ".join(t + " (" + current[t]["status"] + ")" for t in skip["target_ids"])
+                effect = "; ".join("required target remains " + current[t]["status"] for t in skip["target_ids"])
+            else:
+                related = "none (explicitly outside declared targets)"
+                effect = ("No effect on required-target completeness." if record["status"] == "passed" else
+                          "Suite target remains " + record["status"] + "; it does not contribute to passing completeness.")
+            lines += ["- Test: " + text(skip["test"]) + "; reason: " + text(skip["reason"]) +
+                      "; Expected for environment: " + str(skip["expected_for_environment"]).lower() +
+                      "; Condition: " + text(json.dumps(skip["condition"], sort_keys=True)) +
+                      "; Required targets: " + text(related) + "; Effect: " + text(effect)]
+        lines.append("")
+    return lines
+
+
 def render(manifest, summary=None):
     summary = summary or summarize(manifest)
     lines = ["# Evidence report", "", "Scope: " + text(manifest["scope"]),
@@ -56,6 +91,7 @@ def render(manifest, summary=None):
                 if reference:
                     lines.append(key + ": " + text(json.dumps(reference, sort_keys=True)))
             lines += ["Caveats: " + text("; ".join(r["caveats"]) or "none recorded"), ""]
+    lines += skip_report(manifest)
     lines += ["## Before/after observations", ""]
     records = {r["id"]: r for r in manifest["records"]}
     for comparison in manifest["comparisons"]:

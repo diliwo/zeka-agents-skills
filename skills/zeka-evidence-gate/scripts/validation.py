@@ -114,6 +114,47 @@ def placeholders(value):
             placeholders(child)
 
 
+def validate_skips(records, targets, current):
+    """Validate producer-declared relationships; never infer them from test names."""
+    for record in records.values():
+        environment = record["environment"]
+        prerequisites = index(environment.get("prerequisites", []), "environment prerequisite")
+        details = record["details"]
+        if record["class"] not in ("unit", "integration") or details is None:
+            continue
+        skips = details.get("skips", [])
+        require(details["skipped"] == len(skips), "reported skip count differs from accounted inventory")
+        identities = [skip["test"] for skip in skips]
+        require(len(set(identities)) == len(identities), "duplicate skipped test identity")
+        for skip in skips:
+            require(skip["test"] == skip["test"].strip(), "skipped test identity must be canonical")
+            ids = skip["target_ids"]
+            require(len(ids) == len(set(ids)), "duplicate skip target reference")
+            require(set(ids) <= set(targets), "skip refers to unknown required target")
+            condition = skip["condition"]
+            if condition is None:
+                expected = False
+            elif condition["kind"] == "platform":
+                supported = condition["supported_os"]
+                require(len(supported) == len(set(supported)), "duplicate supported OS in skip condition")
+                require(environment["os"] in ("Windows", "Linux", "macOS", "FreeBSD"),
+                        "platform skip requires a canonical recorded OS")
+                expected = environment["os"] not in supported
+            elif condition["kind"] == "prerequisite":
+                require(condition["id"] in prerequisites, "skip prerequisite is not recorded in environment")
+                expected = not prerequisites[condition["id"]]["available"]
+            else:  # Strict schema admits only explicit_exclusion here; its authority is producer-verified.
+                expected = True
+            require(skip["expected_for_environment"] == expected,
+                    "skip expectation contradicts its recorded environment condition")
+            if record["status"] == "passed":
+                require(expected, "unexpected skip cannot accompany a passing suite obligation")
+                require(record["target_id"] not in ids, "passing suite target depends on a skipped scenario")
+            if record["phase"] != "before":
+                require(all(current[target_id]["status"] in ("untested", "blocked") for target_id in ids),
+                        "skipped required target must be explicitly untested or blocked")
+
+
 def validate_manifest(manifest):
     scan_value(manifest)
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
@@ -183,8 +224,8 @@ def validate_manifest(manifest):
             count = details["passed"] + details["failed"]
             require(count > 0, "no tests executed")
             if status == "passed":
-                require(details["failed"] == 0 and details["skipped"] == 0 and record["exit_code"] == 0,
-                        "passing test suite includes failures/skips or lacks successful exit")
+                require(details["failed"] == 0 and record["exit_code"] == 0,
+                        "passing test suite includes failures or lacks successful exit")
         if record["level"] == "protected_ci":
             require(record["class"] == "ci", "protected CI level requires CI evidence")
         if record["class"] == "ci" and executed:
@@ -205,6 +246,7 @@ def validate_manifest(manifest):
         if record["class"] == "ui" and status == "passed":
             require(details["visual_review"]["reviewed"], "UI evidence needs visual review")
     require(set(current) == set(targets), "required target lacks current passed/failed/untested/blocked record")
+    validate_skips(records, targets, current)
     used = {aid for r in records.values() for aid in r["artifact_ids"]}
     require(used == set(artifacts), "unreferenced artifact")
     compared = set()

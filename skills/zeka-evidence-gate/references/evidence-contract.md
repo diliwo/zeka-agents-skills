@@ -66,7 +66,7 @@ arbitrary prose as an executable assertion.
 ### Tool and runtime versions
 
 `environment` requires `os` and `data` (`synthetic | sanitized | non_sensitive`), with
-optional `description` and structured `versions`. The record also supports `versions`
+optional `description`, structured `versions`, and `prerequisites` (see skip accounting). The record also supports `versions`
 for record-specific tools. Entries have required `name`, `version`, and `kind`
 (`tool | runtime | service | image`), plus optional `digest`.
 
@@ -111,7 +111,7 @@ there is no unrestricted `other` kind or arbitrary metadata escape hatch.
 
 | Class | Required details for executed records |
 |---|---|
-| `unit`, `integration` | project, suite, Debug/Release configuration, nullable filter, passed/failed/skipped counts, duration_ms |
+| `unit`, `integration` | project, suite, Debug/Release configuration, nullable filter, passed/failed/skipped counts, duration_ms; structured skips when skipped > 0 |
 | `postgresql` | exact role/database, catalog_query, expected_state, observed_state, nullable rls_result and transaction_context |
 | `api` | scenario, request method/path and optional safe metadata, response_status/body, nullable retry_duplicate and timing_ms |
 | `messaging` | event_id, revision, delivery_count, expected_disposition, durable_state, nullable retry_redelivery |
@@ -121,8 +121,9 @@ there is no unrestricted `other` kind or arbitrary metadata escape hatch.
 
 Null class-specific fields mean that aspect was not measured; explain material gaps
 in caveats and declare separate targets if the task requires those aspects.
-Passing unit/integration suites require at least one executed test, no failures or
-skips, and exit zero. Split intentionally unexecuted assertions into explicit targets.
+Passing unit/integration suites require at least one executed test, zero failures,
+exit zero, and accountability for every skipped test as described below. Skips do not
+satisfy required targets. Split unexecuted required scenarios into explicit targets.
 Counts and duration come from the actual runner; the helper checks the sanitized
 structured export and does not parse every native test format.
 
@@ -132,6 +133,89 @@ listed required checks to exist and succeed, with exact record SHA throughout. T
 collector must enumerate actual protected requirements, including applicable legacy
 statuses or merge-queue checks. Their authority is referenced by `requirements_ref`.
 Pending/unavailable CI is untested/blocked with a reason, not passed.
+
+
+## Skip accountability (compatible v1 extension)
+
+`details.skips` is optional for unit/integration records only when `skipped` is zero.
+Omission means an empty inventory. Existing zero-skip manifests, result artifacts and
+reports remain valid unchanged. If counts are recorded, the inventory must have
+exactly `skipped` entries, even when the record is failed, blocked, untested or historical.
+
+Each entry has exactly five required fields:
+
+```json
+{
+  "test": "Backend.Tests::WindowsVolumeTests.Read",
+  "reason": "Requires Windows volume APIs; unavailable on Linux.",
+  "expected_for_environment": true,
+  "target_ids": [],
+  "condition": {"kind": "platform", "supported_os": ["Windows"]}
+}
+```
+
+Use a stable, unique identity for each runner-counted test, including project/suite
+and parameterized case identity where necessary. Duplicate identities, blank identities
+or reasons, placeholder reasons, unknown target IDs, and duplicate target references
+are rejected. A prose caveat cannot replace inventory. Inventory remains inside the
+hashed structured result, so changing it also requires an updated source artifact.
+
+`target_ids` must list every declared target whose required scenario was left unexecuted
+by this skip. An explicit empty array declares that no required target depends on that
+scenario for this execution environment. It is not an unknown mapping or a waiver.
+If the producer cannot establish this relationship, record the affected suite obligation
+as blocked and resolve the mapping before presenting it as passing evidence.
+
+For current records, every referenced target must have its own `untested` or `blocked`
+record with a reason. It cannot be passed, even if another aggregate suite is green.
+A suite may pass for its own independently executed obligations while another target
+is explicitly untested/blocked; the bundle remains incomplete. If the suite target
+itself requires the skipped scenario, that suite target cannot pass either. Historical
+before records keep their own SHA and do not invalidate current after evidence; a
+historical passing suite still cannot list its own target as skipped.
+
+### Deterministic environment conditions
+
+| `condition` | Meaning and verification |
+|---|---|
+| `{"kind":"platform","supported_os":["Windows"]}` | The test can run on the listed OS families. The skip is expected only when the recorded OS is outside this list. |
+| `{"kind":"prerequisite","id":"disposable-database"}` | The skip is expected only when this prerequisite is recorded as unavailable. Missing/ambiguous prerequisite declarations are rejected. |
+| `{"kind":"explicit_exclusion","ref":{"kind":"decision","locator":"decision:optional-stress-exclusion"}}` | The producer has verified an intentional exclusion in the referenced execution contract/decision. It cannot override required targets. |
+| `null` | No understood condition is recorded; `expected_for_environment` must be false and the suite cannot pass. |
+
+For platform conditions, both `environment.os` and `supported_os` use canonical,
+case-sensitive `Windows`, `Linux`, `macOS` or `FreeBSD`. Put distribution/version text
+in `description` or structured versions. Unknown values such as `Windows 11` fail
+closed rather than being guessed to mean a different platform. The supported list
+must be nonempty and contain no duplicates. Tests requiring another OS can use an
+explicitly recorded prerequisite until a canonical platform is added to the contract.
+
+For prerequisite conditions, record the same environment's observations using optional
+`environment.prerequisites`, a strict array of `{ "id": "disposable-database",
+"available": false }` objects with unique IDs. The verifier checks the referenced
+availability boolean; it does not probe services or interpret prose preconditions.
+
+The verifier evaluates the condition and requires `expected_for_environment` to agree.
+A passing suite permits only expected skips. Unexpected skips can be documented in
+failed/blocked/untested evidence, but cannot produce a passing suite obligation.
+The producer verifies exclusion authority and prerequisite observations; the helper
+does not authenticate a decision reference or inspect the machine remotely.
+
+Example: 573 passed, zero failed, and two uniquely identified Windows-only tests
+skipped on Linux can pass regression evidence if both skips are fully accounted for
+and outside that record's required obligations. All declared targets must independently
+pass for the bundle to be complete. Associating either skip with a passed target is
+rejected; making that target explicitly untested/blocked preserves a valid but
+incomplete bundle.
+
+The report exposes counts, identities, reasons, conditions, expected flags, target
+relationships and completeness effects. Zero-skip reports keep their existing format.
+The review-loop adapter continues to export passing independent evidence normally;
+untested targets map to missing and blocked targets map to unavailable at their level.
+
+The producer declares test-to-target relationships. Neither test names, prose reasons,
+nor parsing TRX automatically establish architectural or requirement coverage. The
+verifier checks declared consistency and does not discover dishonest or omitted mappings.
 
 ## Artifacts and before/after
 

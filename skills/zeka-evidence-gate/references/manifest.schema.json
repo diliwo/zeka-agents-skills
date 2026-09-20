@@ -585,6 +585,27 @@
         },
         "versions": {
           "$ref": "#/$defs/versions"
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "available": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "available"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
         }
       },
       "required": [
@@ -851,6 +872,13 @@
                     "duration_ms": {
                       "type": "number",
                       "minimum": 0
+                    },
+                    "skips": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/skip"
+                      },
+                      "minItems": 0
                     }
                   },
                   "required": [
@@ -922,6 +950,13 @@
                     "duration_ms": {
                       "type": "number",
                       "minimum": 0
+                    },
+                    "skips": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/skip"
+                      },
+                      "minItems": 0
                     }
                   },
                   "required": [
@@ -1499,6 +1534,103 @@
         "target_id",
         "before_id",
         "after_id"
+      ],
+      "additionalProperties": false
+    },
+    "skip": {
+      "type": "object",
+      "properties": {
+        "test": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_for_environment": {
+          "type": "boolean"
+        },
+        "target_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "condition": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "platform"
+                },
+                "supported_os": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "Windows",
+                      "Linux",
+                      "macOS",
+                      "FreeBSD"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "kind",
+                "supported_os"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "prerequisite"
+                },
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "explicit_exclusion"
+                },
+                "ref": {
+                  "$ref": "#/$defs/reference"
+                }
+              },
+              "required": [
+                "kind",
+                "ref"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "test",
+        "reason",
+        "expected_for_environment",
+        "target_ids",
+        "condition"
       ],
       "additionalProperties": false
     }

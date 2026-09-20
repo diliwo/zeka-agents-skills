@@ -38,7 +38,12 @@ checks declared coverage; reconcile that inventory with the actual contract.
 3. Run authorized tests using existing project tooling. Capture configuration, filter,
    counts and duration for .NET tests; relevant database, API, messaging, storage or
    CI observations using the typed contract. Record structured tool/runtime versions
-   when available. Commands in the manifest are data; helpers never execute them.
+   when available. Account for every runner-reported skip in `details.skips`, with
+   stable identity, reason, environment condition and explicit target relationships.
+   Only expected, accounted skips outside a passing target's obligations may coexist
+   with that target passing. Required skipped scenarios remain `untested` or `blocked`;
+   never infer their harmlessness from names, prose or aggregate counts. See the
+   contract's skip-accountability rules. Commands are data; helpers never execute them.
 4. Use synthetic fixtures or explicitly allowlisted exports. Do not dump environment
    variables, connection strings, headers, raw production payloads, personal data or
    private file contents. Sanitize at the producer before writing evidence. If safe
