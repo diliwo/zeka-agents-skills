@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "capture_id": "synthetic-capture",
+  "started_at": "2026-09-20T10:00:00+00:00",
+  "captured_at": "2026-09-20T10:00:00+00:00",
+  "capture_mode": "synthetic",
+  "repository": "example/base",
+  "pr_number": 7,
+  "consistency": {
+    "status": "stable",
+    "boundary_source_ids": [
+      "S-001",
+      "S-002",
+      "S-009",
+      "S-010"
+    ],
+    "reason_codes": []
+  },
+  "pr": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-001"
+    ],
+    "data": {
+      "repository": "example/base",
+      "number": 7,
+      "url": "https://github.com/example/base/pull/7",
+      "state": "open",
+      "draft": false,
+      "base": {
+        "repository": "example/base",
+        "branch": "main",
+        "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "head": {
+        "repository": "example/fork",
+        "branch": "feature",
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  },
+  "workspace": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-002"
+    ],
+    "data": {
+      "workspace_id": "synthetic-checkout",
+      "branch": "feature",
+      "detached": false,
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "remote": {
+        "name": "origin",
+        "repository": "example/fork",
+        "identity_status": "available",
+        "reason_code": null
+      },
+      "remote_tracking": {
+        "ref": "refs/remotes/origin/feature",
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "availability": "available"
+      },
+      "worktree": {
+        "clean": true,
+        "staged": false,
+        "unstaged": false,
+        "untracked": false,
+        "unmerged": false,
+        "status_fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "shallow": false,
+      "observed_at": "2026-09-20T10:00:00+00:00"
+    }
+  },
+  "remote_branch": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-003"
+    ],
+    "data": {
+      "repository": "example/fork",
+      "branch": "feature",
+      "ref": "refs/heads/feature",
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "observed_at": "2026-09-20T10:00:00+00:00"
+    }
+  },
+  "checks": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-004",
+      "S-005"
+    ],
+    "data": [
+      {
+        "key": "check_run:example/base:1",
+        "kind": "check_run",
+        "repository": "example/base",
+        "id": 1,
+        "name": "ci",
+        "source": {
+          "kind": "app",
+          "id": 11,
+          "slug": "example-ci"
+        },
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "binding": {
+          "method": "payload_sha",
+          "source_id": "S-004"
+        },
+        "url": null,
+        "created_at": "2026-09-20T10:00:00+00:00",
+        "started_at": null,
+        "completed_at": null,
+        "updated_at": null
+      }
+    ]
+  },
+  "review_sources": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-004",
+      "S-001",
+      "S-006",
+      "S-007",
+      "S-008"
+    ],
+    "data": [
+      {
+        "key": "check_output:example/base:1",
+        "source_type": "check_output",
+        "repository": "example/base",
+        "id": 1,
+        "actor": {
+          "kind": "app",
+          "id": 11,
+          "slug": "example-ci"
+        },
+        "associated_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "binding": "payload_sha",
+        "created_at": "2026-09-20T10:00:00+00:00",
+        "submitted_at": null,
+        "updated_at": null,
+        "state": "completed",
+        "content_sha256": "05237e990d7e655de465810636a9a6ada9114dbf0513be7b43f930c04517aaaf",
+        "url": null,
+        "source_id": "S-004"
+      },
+      {
+        "key": "pr_body:example/base:100",
+        "source_type": "pr_body",
+        "repository": "example/base",
+        "id": 100,
+        "actor": {
+          "kind": "account",
+          "id": 9,
+          "slug": null
+        },
+        "associated_sha": null,
+        "binding": "unavailable",
+        "created_at": "2026-09-20T10:00:00+00:00",
+        "submitted_at": null,
+        "updated_at": "2026-09-20T10:00:00+00:00",
+        "state": null,
+        "content_sha256": "2b25354f595c9c60055fdd18da3005a09fd23bece1ea61331c8daac855afe0ef",
+        "url": "https://github.com/example/base/pull/7",
+        "source_id": "S-001"
+      }
+    ]
+  },
+  "mergeability": {
+    "availability": "available",
+    "reason_code": null,
+    "source_ids": [
+      "S-009"
+    ],
+    "data": {
+      "mergeable": null,
+      "state": "unknown",
+      "observed_at": "2026-09-20T10:00:00+00:00"
+    }
+  },
+  "required_check_contract": {
+    "availability": "not_requested",
+    "reason_code": "not_requested",
+    "source_ids": [],
+    "data": null
+  },
+  "ancestry": [],
+  "sources": [
+    {
+      "id": "S-001",
+      "kind": "synthetic",
+      "operation": "pr",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": "repos/example/base/pulls/7",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": "2827c2d3b4bdfb6dd59365ec022f10c1562dd6e30750894faa425266760e391e"
+      }
+    },
+    {
+      "id": "S-002",
+      "kind": "synthetic",
+      "operation": "workspace",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": null,
+        "workspace_id": "synthetic-checkout",
+        "api_version": null,
+        "pages": 0,
+        "complete": true,
+        "fingerprint": "1deb62146b6bf0e274dca910d8330ffca80e09b899a5805a04e6b43e31dfad1c"
+      }
+    },
+    {
+      "id": "S-003",
+      "kind": "synthetic",
+      "operation": "remote_ref",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/fork",
+        "pr_number": 7,
+        "sha": null,
+        "ref": "refs/heads/feature",
+        "endpoint": "repos/example/fork/git/ref/heads/feature",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-004",
+      "kind": "synthetic",
+      "operation": "check_runs",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "ref": null,
+        "endpoint": "repos/example/base/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-005",
+      "kind": "synthetic",
+      "operation": "commit_statuses",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "ref": null,
+        "endpoint": "repos/example/base/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-006",
+      "kind": "synthetic",
+      "operation": "issue_comments",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": "repos/example/base/issues/7/comments",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-007",
+      "kind": "synthetic",
+      "operation": "inline_comments",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": "repos/example/base/pulls/7/comments",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-008",
+      "kind": "synthetic",
+      "operation": "reviews",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": "repos/example/base/pulls/7/reviews",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": null
+      }
+    },
+    {
+      "id": "S-009",
+      "kind": "synthetic",
+      "operation": "pr",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": "repos/example/base/pulls/7",
+        "workspace_id": null,
+        "api_version": "2026-03-10",
+        "pages": 1,
+        "complete": true,
+        "fingerprint": "2827c2d3b4bdfb6dd59365ec022f10c1562dd6e30750894faa425266760e391e"
+      }
+    },
+    {
+      "id": "S-010",
+      "kind": "synthetic",
+      "operation": "workspace",
+      "status": "available",
+      "reason_code": null,
+      "observed_at": "2026-09-20T10:00:00+00:00",
+      "metadata": {
+        "repository": "example/base",
+        "pr_number": 7,
+        "sha": null,
+        "ref": null,
+        "endpoint": null,
+        "workspace_id": "synthetic-checkout",
+        "api_version": null,
+        "pages": 0,
+        "complete": true,
+        "fingerprint": "1deb62146b6bf0e274dca910d8330ffca80e09b899a5805a04e6b43e31dfad1c"
+      }
+    }
+  ],
+  "limitations": [
+    "Bounded observations are not an atomic GitHub transaction.",
+    "Required-check policy is not collected in v1.",
+    "Hashes establish content consistency, not authenticity.",
+    "Worktree fingerprint hashes status inventory, not file contents.",
+    "Review bodies and provider semantics remain consumer responsibilities."
+  ]
+}

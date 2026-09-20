@@ -4,6 +4,14 @@ Engineering skills developed while building Zeka with coding agents.
 
 ## Skills
 
+- [zeka-pr-state](skills/zeka-pr-state/SKILL.md): standalone, read-only Git/GitHub
+  observations, explicit expectations, exact-revision verification, ancestry and
+  structural snapshot comparison. Keeps PR head, live branch and cached tracking
+  refs distinct. Requires Python 3.10+, Git and authenticated GitHub CLI for live
+  capture. See its [execution reference](skills/zeka-pr-state/references/execution.md)
+  and [incremental integration plan](skills/zeka-pr-state/references/integration-plan.md).
+  Neither existing consumer has been refactored.
+
 - [zeka-evidence-gate](skills/zeka-evidence-gate/SKILL.md): behavior-first evidence
   manifests, reports and verification bound to an immutable revision, with structured
   provenance, explicit skipped-test accounting and a review-loop adapter. Requires
@@ -15,6 +23,23 @@ Engineering skills developed while building Zeka with coding agents.
   Requires Python 3.10+, Git and an authenticated GitHub CLI for live collection.
   See its [execution reference](skills/zeka-review-loop/references/execution.md) for
   configuration, commands and provider limitations.
+
+## PR-state workflow
+
+Capture to a new ignored runtime path, verify explicit expectations, then compare
+fresh captures before dependent work. Observed checks are separate from required
+check obligations. Unavailable revision binding or incomplete collection fails
+closed for assertions that need it. Base movement is classified separately from
+head movement, leaving each consumer's freshness policy intact.
+
+Inspect the synthetic fork example offline:
+
+```text
+python skills/zeka-pr-state/scripts/pr_state.py verify --snapshot skills/zeka-pr-state/tests/fixtures/fork-snapshot.json --expectations skills/zeka-pr-state/tests/fixtures/expectations.json
+```
+
+The result is explicitly synthetic, not live PR evidence. PR-state does not replace
+review-loop governance or evidence-gate completeness and skip accounting.
 
 ## Evidence workflow
 
@@ -63,6 +88,7 @@ supported by your coding agent. Keep its scripts and references together.
 Run offline behavioral tests without installing dependencies:
 
 ```text
+python -m unittest discover -s skills/zeka-pr-state/tests -v
 python -m unittest discover -s skills/zeka-review-loop/tests -v
 python -m unittest discover -s skills/zeka-evidence-gate/tests -v
 ```

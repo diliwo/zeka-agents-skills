@@ -1,0 +1,4 @@
+interface:
+  display_name: "Zeka PR State"
+  short_description: "Capture and verify exact PR and repository state"
+  default_prompt: "Use $zeka-pr-state to capture repository and PR observations, verify explicit expectations, and report structural snapshot changes without changing governance or repository state."

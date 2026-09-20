@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "expectation_id": "synthetic-expectation",
+  "identity": {
+    "repository": "example/base",
+    "pr_number": 7,
+    "state": "open",
+    "head": {
+      "repository": "example/fork",
+      "branch": "feature",
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "workspace": {
+    "workspace_id": "synthetic-checkout",
+    "remote_repository": "example/fork",
+    "must_be_clean": true
+  },
+  "agreement": {
+    "local_head_equals_pr_head": true,
+    "live_remote_equals_pr_head": true,
+    "remote_tracking_equals_pr_head": true
+  },
+  "required_checks": [
+    {
+      "kind": "check_run",
+      "name": "ci",
+      "must_be_completed": true,
+      "must_be_successful": true
+    }
+  ]
+}

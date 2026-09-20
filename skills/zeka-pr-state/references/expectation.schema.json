@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Zeka PR-state expectations v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "expectation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+        },
+        "pr_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "enum": [
+            "open",
+            "closed",
+            "merged"
+          ]
+        },
+        "head": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+            },
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha": {
+              "type": "string",
+              "pattern": "[0-9a-f]{40}"
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "base": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+            },
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha": {
+              "type": "string",
+              "pattern": "[0-9a-f]{40}"
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "minProperties": 1
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "head_sha": {
+          "type": "string",
+          "pattern": "[0-9a-f]{40}"
+        },
+        "branch": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remote_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "remote_repository": {
+          "type": "string",
+          "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+        },
+        "must_be_clean": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "remote_branch": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha": {
+          "type": "string",
+          "pattern": "[0-9a-f]{40}"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "agreement": {
+      "type": "object",
+      "properties": {
+        "local_head_equals_pr_head": {
+          "type": "boolean"
+        },
+        "local_branch_equals_head_branch": {
+          "type": "boolean"
+        },
+        "live_remote_equals_pr_head": {
+          "type": "boolean"
+        },
+        "remote_tracking_equals_pr_head": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "ancestors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "[0-9a-f]{40}"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "required_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "check_run",
+              "commit_status"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "app",
+                  "account",
+                  "unknown"
+                ]
+              },
+              "id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "slug": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "minProperties": 1
+          },
+          "selection": {
+            "enum": [
+              "unique",
+              "latest_id"
+            ]
+          },
+          "must_be_completed": {
+            "type": "boolean"
+          },
+          "must_be_successful": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "must_be_completed",
+          "must_be_successful"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "previous": {
+      "type": "object",
+      "properties": {
+        "capture_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "head_sha": {
+          "type": "string",
+          "pattern": "[0-9a-f]{40}"
+        },
+        "unchanged": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "head_moved",
+              "base_moved",
+              "branch_changed",
+              "base_branch_changed",
+              "head_repository_changed",
+              "base_repository_changed",
+              "pr_state_changed",
+              "worktree_changed",
+              "local_head_changed",
+              "local_branch_changed",
+              "remote_branch_changed",
+              "remote_tracking_changed",
+              "checks_changed",
+              "review_sources_changed",
+              "mergeability_changed",
+              "required_check_contract_changed",
+              "availability_changed",
+              "repository_or_pr_identity_changed",
+              "workspace_identity_changed",
+              "workspace_remote_changed"
+            ]
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "capture_id",
+        "unchanged"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "expectation_id"
+  ],
+  "additionalProperties": false
+}

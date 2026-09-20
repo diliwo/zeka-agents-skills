@@ -1,0 +1,1651 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Zeka PR-state snapshot v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "capture_mode": {
+      "enum": [
+        "github",
+        "github_workspace",
+        "synthetic"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+    },
+    "pr_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "consistency": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "stable",
+            "changed",
+            "unknown"
+          ]
+        },
+        "boundary_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "not_requested",
+              "api_failed",
+              "command_missing",
+              "command_failed",
+              "timeout",
+              "limit_reached",
+              "pagination_changed",
+              "unsupported_remote",
+              "credential_remote",
+              "unsupported_tracking",
+              "missing_ref",
+              "missing_object",
+              "shallow_history",
+              "graph_query_failed",
+              "workspace_unavailable",
+              "unknown_head_repository",
+              "capture_changed",
+              "boundary_unavailable",
+              "invalid_response"
+            ]
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "status",
+        "boundary_source_ids",
+        "reason_codes"
+      ],
+      "additionalProperties": false
+    },
+    "pr": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "repository": {
+                  "type": "string",
+                  "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                },
+                "number": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "url": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "enum": [
+                    "open",
+                    "closed",
+                    "merged"
+                  ]
+                },
+                "draft": {
+                  "type": "boolean"
+                },
+                "base": {
+                  "type": "object",
+                  "properties": {
+                    "repository": {
+                      "type": "string",
+                      "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                    },
+                    "branch": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sha": {
+                      "type": "string",
+                      "pattern": "[0-9a-f]{40}"
+                    }
+                  },
+                  "required": [
+                    "repository",
+                    "branch",
+                    "sha"
+                  ],
+                  "additionalProperties": false
+                },
+                "head": {
+                  "type": "object",
+                  "properties": {
+                    "repository": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "branch": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sha": {
+                      "type": "string",
+                      "pattern": "[0-9a-f]{40}"
+                    }
+                  },
+                  "required": [
+                    "repository",
+                    "branch",
+                    "sha"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "repository",
+                "number",
+                "url",
+                "state",
+                "draft",
+                "base",
+                "head"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "workspace_id": {
+                  "type": "string",
+                  "pattern": "[A-Za-z0-9_:.-]+"
+                },
+                "branch": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "detached": {
+                  "type": "boolean"
+                },
+                "head_sha": {
+                  "type": "string",
+                  "pattern": "[0-9a-f]{40}"
+                },
+                "remote": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "repository": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "identity_status": {
+                      "enum": [
+                        "available",
+                        "not_requested",
+                        "unavailable",
+                        "unsupported_environment",
+                        "api_failure"
+                      ]
+                    },
+                    "reason_code": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "not_requested",
+                            "api_failed",
+                            "command_missing",
+                            "command_failed",
+                            "timeout",
+                            "limit_reached",
+                            "pagination_changed",
+                            "unsupported_remote",
+                            "credential_remote",
+                            "unsupported_tracking",
+                            "missing_ref",
+                            "missing_object",
+                            "shallow_history",
+                            "graph_query_failed",
+                            "workspace_unavailable",
+                            "unknown_head_repository",
+                            "capture_changed",
+                            "boundary_unavailable",
+                            "invalid_response"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "repository",
+                    "identity_status",
+                    "reason_code"
+                  ],
+                  "additionalProperties": false
+                },
+                "remote_tracking": {
+                  "type": "object",
+                  "properties": {
+                    "ref": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sha": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "[0-9a-f]{40}"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "availability": {
+                      "enum": [
+                        "available",
+                        "not_requested",
+                        "unavailable",
+                        "unsupported_environment",
+                        "api_failure"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ref",
+                    "sha",
+                    "availability"
+                  ],
+                  "additionalProperties": false
+                },
+                "worktree": {
+                  "type": "object",
+                  "properties": {
+                    "clean": {
+                      "type": "boolean"
+                    },
+                    "staged": {
+                      "type": "boolean"
+                    },
+                    "unstaged": {
+                      "type": "boolean"
+                    },
+                    "untracked": {
+                      "type": "boolean"
+                    },
+                    "unmerged": {
+                      "type": "boolean"
+                    },
+                    "status_fingerprint": {
+                      "type": "string",
+                      "pattern": "[0-9a-f]{64}"
+                    }
+                  },
+                  "required": [
+                    "clean",
+                    "staged",
+                    "unstaged",
+                    "untracked",
+                    "unmerged",
+                    "status_fingerprint"
+                  ],
+                  "additionalProperties": false
+                },
+                "shallow": {
+                  "type": "boolean"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "workspace_id",
+                "branch",
+                "detached",
+                "head_sha",
+                "remote",
+                "remote_tracking",
+                "worktree",
+                "shallow",
+                "observed_at"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "remote_branch": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "repository": {
+                  "type": "string",
+                  "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                },
+                "branch": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha": {
+                  "type": "string",
+                  "pattern": "[0-9a-f]{40}"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "repository",
+                "branch",
+                "ref",
+                "sha",
+                "observed_at"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "ancestry": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ancestor_sha": {
+            "type": "string",
+            "pattern": "[0-9a-f]{40}"
+          },
+          "descendant_sha": {
+            "type": "string",
+            "pattern": "[0-9a-f]{40}"
+          },
+          "method": {
+            "const": "git_merge_base"
+          },
+          "availability": {
+            "enum": [
+              "available",
+              "not_requested",
+              "unavailable",
+              "unsupported_environment",
+              "api_failure"
+            ]
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "is_ancestor": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "merge_bases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "[0-9a-f]{40}"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "enum": [
+                  "not_requested",
+                  "api_failed",
+                  "command_missing",
+                  "command_failed",
+                  "timeout",
+                  "limit_reached",
+                  "pagination_changed",
+                  "unsupported_remote",
+                  "credential_remote",
+                  "unsupported_tracking",
+                  "missing_ref",
+                  "missing_object",
+                  "shallow_history",
+                  "graph_query_failed",
+                  "workspace_unavailable",
+                  "unknown_head_repository",
+                  "capture_changed",
+                  "boundary_unavailable",
+                  "invalid_response"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ancestor_sha",
+          "descendant_sha",
+          "method",
+          "availability",
+          "source_id",
+          "is_ancestor",
+          "merge_bases",
+          "reason_code"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "checks": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "kind": {
+                    "enum": [
+                      "check_run",
+                      "commit_status"
+                    ]
+                  },
+                  "repository": {
+                    "type": "string",
+                    "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "app",
+                          "account",
+                          "unknown"
+                        ]
+                      },
+                      "id": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "slug": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "slug"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "status": {
+                    "enum": [
+                      "queued",
+                      "in_progress",
+                      "completed",
+                      "unknown"
+                    ]
+                  },
+                  "conclusion": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "success",
+                          "failure",
+                          "error",
+                          "neutral",
+                          "skipped",
+                          "cancelled",
+                          "timed_out",
+                          "action_required",
+                          "stale",
+                          "startup_failure",
+                          "unknown"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "head_sha": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "[0-9a-f]{40}"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "binding": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "enum": [
+                          "payload_sha",
+                          "exact_sha_endpoint",
+                          "unavailable"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "source_id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "url": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "started_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "completed_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updated_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "key",
+                  "kind",
+                  "repository",
+                  "id",
+                  "name",
+                  "source",
+                  "status",
+                  "conclusion",
+                  "head_sha",
+                  "binding",
+                  "url",
+                  "created_at",
+                  "started_at",
+                  "completed_at",
+                  "updated_at"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "review_sources": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_type": {
+                    "enum": [
+                      "pr_body",
+                      "issue_comment",
+                      "inline_comment",
+                      "review",
+                      "check_output"
+                    ]
+                  },
+                  "repository": {
+                    "type": "string",
+                    "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "actor": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "app",
+                          "bot",
+                          "account",
+                          "unknown"
+                        ]
+                      },
+                      "id": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "slug": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "slug"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "associated_sha": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "[0-9a-f]{40}"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "binding": {
+                    "enum": [
+                      "payload_sha",
+                      "unavailable"
+                    ]
+                  },
+                  "created_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "submitted_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "updated_at": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "state": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "APPROVED",
+                          "CHANGES_REQUESTED",
+                          "COMMENTED",
+                          "PENDING",
+                          "DISMISSED",
+                          "queued",
+                          "in_progress",
+                          "completed",
+                          "unknown"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  "url": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "key",
+                  "source_type",
+                  "repository",
+                  "id",
+                  "actor",
+                  "associated_sha",
+                  "binding",
+                  "created_at",
+                  "submitted_at",
+                  "updated_at",
+                  "state",
+                  "content_sha256",
+                  "url",
+                  "source_id"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "mergeability": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mergeable": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "state": {
+                  "enum": [
+                    "clean",
+                    "dirty",
+                    "blocked",
+                    "behind",
+                    "unstable",
+                    "draft",
+                    "unknown"
+                  ]
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "mergeable",
+                "state",
+                "observed_at"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "required_check_contract": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "not_requested",
+            "unavailable",
+            "unsupported_environment",
+            "api_failure"
+          ]
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "not_requested",
+                "api_failed",
+                "command_missing",
+                "command_failed",
+                "timeout",
+                "limit_reached",
+                "pagination_changed",
+                "unsupported_remote",
+                "credential_remote",
+                "unsupported_tracking",
+                "missing_ref",
+                "missing_object",
+                "shallow_history",
+                "graph_query_failed",
+                "workspace_unavailable",
+                "unknown_head_repository",
+                "capture_changed",
+                "boundary_unavailable",
+                "invalid_response"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "data": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reference": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "content_sha256": {
+                  "type": "string",
+                  "pattern": "[0-9a-f]{64}"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "reference",
+                "revision",
+                "content_sha256",
+                "observed_at"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "reason_code",
+        "source_ids",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "git_command",
+              "github_rest",
+              "synthetic"
+            ]
+          },
+          "operation": {
+            "enum": [
+              "pr",
+              "workspace",
+              "remote_ref",
+              "check_runs",
+              "commit_statuses",
+              "issue_comments",
+              "inline_comments",
+              "reviews",
+              "ancestry"
+            ]
+          },
+          "status": {
+            "enum": [
+              "available",
+              "not_requested",
+              "unavailable",
+              "unsupported_environment",
+              "api_failure"
+            ]
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "enum": [
+                  "not_requested",
+                  "api_failed",
+                  "command_missing",
+                  "command_failed",
+                  "timeout",
+                  "limit_reached",
+                  "pagination_changed",
+                  "unsupported_remote",
+                  "credential_remote",
+                  "unsupported_tracking",
+                  "missing_ref",
+                  "missing_object",
+                  "shallow_history",
+                  "graph_query_failed",
+                  "workspace_unavailable",
+                  "unknown_head_repository",
+                  "capture_changed",
+                  "boundary_unavailable",
+                  "invalid_response"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "repository": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "[a-z0-9_.-]+/[a-z0-9_.-]+"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pr_number": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sha": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{40}"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "endpoint": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "workspace_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "api_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pages": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "complete": {
+                "type": "boolean"
+              },
+              "fingerprint": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "repository",
+              "pr_number",
+              "sha",
+              "ref",
+              "endpoint",
+              "workspace_id",
+              "api_version",
+              "pages",
+              "complete",
+              "fingerprint"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "operation",
+          "status",
+          "reason_code",
+          "observed_at",
+          "metadata"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "capture_id",
+    "started_at",
+    "captured_at",
+    "capture_mode",
+    "repository",
+    "pr_number",
+    "consistency",
+    "pr",
+    "workspace",
+    "remote_branch",
+    "ancestry",
+    "checks",
+    "review_sources",
+    "mergeability",
+    "required_check_contract",
+    "sources",
+    "limitations"
+  ],
+  "additionalProperties": false
+}
