@@ -78,6 +78,21 @@ Evidence supports Chief's final review; it does not grant merge readiness or rep
 Hervé's final authority. Secret scanning is heuristic, and artifact hashes establish
 consistency rather than authenticating the observations.
 
+## License and reuse
+
+Copyright (c) 2026 Diliwo. This repository's original code, skill instructions,
+documentation, schemas and fixtures are available under the [MIT License](LICENSE).
+
+You may use, copy, modify, redistribute, sublicense and sell this material, including
+for commercial purposes, provided you retain the copyright and permission notices
+in all copies or substantial portions. Include the `LICENSE` file when redistributing
+the repository or individual skill folders. The material is provided "as is", without
+warranty; see the license for the full terms and liability disclaimer.
+
+Referenced third-party projects remain subject to their own licenses. Preserve any
+applicable third-party notices and attribution when reusing their material; this
+repository's license does not relicense those projects.
+
 ## Installation
 
 Install by copying the desired folder from `skills/` into the skill directory
