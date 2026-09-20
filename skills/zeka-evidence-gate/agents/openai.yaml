@@ -1,0 +1,4 @@
+interface:
+  display_name: "Zeka Evidence Gate"
+  short_description: "Verify behavior evidence bound to an immutable revision"
+  default_prompt: "Use $zeka-evidence-gate to produce and verify an evidence bundle for this engineering task."
