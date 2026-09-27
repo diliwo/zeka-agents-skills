@@ -183,6 +183,57 @@ class GreptileCompletionTests(unittest.TestCase):
         t["baseline"]["comments:7"]["greptile_summary"]["sha"] = A
         self.assertTrue(freshness(s, t, c)["fresh"])
 
+    def test_null_baseline_with_unchanged_textual_counter_rejected(self):
+        s, t, c = fixture()
+        before = copy.deepcopy(s)
+        before.update(collected_at=T0, checks=[])
+        before["comments"][0].update(
+            updated_at=T0, body=summary(B, 2).replace("Last reviewed commit:", "Reviewed commit:"))
+        self.assertIn("Reviews (2)", before["comments"][0]["body"])
+        t["baseline"] = baseline(before, c)
+        self.assertIsNone(t["baseline"]["comments:7"]["greptile_summary"])
+        self.assertIn("Reviews (2)", s["comments"][0]["body"])
+        result = freshness(s, t, c)
+        self.assertFalse(result["fresh"])
+        self.assertNotIn("completion", result)
+
+    def test_parsed_baseline_requires_strict_counter_advancement(self):
+        for prior, current, accepted in ((2, 3, True), (2, 2, False), (3, 2, False)):
+            with self.subTest(prior=prior, current=current):
+                s, t, c = fixture()
+                before = copy.deepcopy(s)
+                before.update(collected_at=T0, checks=[])
+                before["comments"][0].update(updated_at=T0, body=summary(B, prior))
+                t["baseline"] = baseline(before, c)
+                s["comments"][0]["body"] = summary(A, current)
+                self.assertEqual(freshness(s, t, c)["fresh"], accepted)
+
+    def test_malformed_prior_binding_and_counter_rejected(self):
+        invalid = [None, {}, [], "unsupported", False, {"sha": B},
+                   {"reviews": 1}, {"reviews": 1, "sha": "unparseable"}]
+        invalid += [{"sha": B, "reviews": value}
+                    for value in (None, True, False, 0, -1, 1.0, "1", [], {})]
+        for prior in invalid:
+            with self.subTest(prior=prior):
+                s, t, c = fixture()
+                t["baseline"]["comments:7"]["greptile_summary"] = prior
+                self.assertFalse(freshness(s, t, c)["fresh"])
+
+    def test_invalid_current_counter_rejected(self):
+        for count in (None, True, 0, -1, 2.5, "", "two"):
+            with self.subTest(count=count):
+                s, t, c = fixture()
+                s["comments"][0]["body"] = summary(count=count)
+                self.assertFalse(freshness(s, t, c)["fresh"])
+
+    def test_existing_invalid_baseline_entry_cannot_become_new_summary(self):
+        for entry in (None, {}, False, []):
+            with self.subTest(entry=entry):
+                s, t, c = fixture()
+                t["baseline"]["comments:7"] = entry
+                s["comments"][0]["created_at"] = T4
+                self.assertFalse(freshness(s, t, c)["fresh"])
+
     def test_unrecorded_historical_summary_rejected(self):
         s, t, c = fixture()
         t["baseline"] = {}
@@ -303,6 +354,20 @@ class GreptileCompletionTests(unittest.TestCase):
                 else:
                     s["comments"].append({"id": 43, "user": {"login": BOT}, "updated_at": T4,
                                           "body": f"<!-- zeka-review-complete sha={A} -->"})
+                result = freshness(s, t, c)
+                self.assertTrue(result["fresh"])
+                self.assertNotIn("completion", result)
+
+    def test_legacy_completion_remains_valid_with_null_summary_baseline(self):
+        for native in (False, True):
+            with self.subTest(native=native):
+                s, t, c = fixture()
+                t["baseline"]["comments:7"]["greptile_summary"] = None
+                if native:
+                    s["reviews"] = [{"id": 42, "user": {"login": BOT}, "commit_id": A,
+                                     "body": "Review complete", "state": "COMMENTED", "submitted_at": T4}]
+                else:
+                    s["comments"][0]["body"] += f"\n<!-- zeka-review-complete sha={A} -->"
                 result = freshness(s, t, c)
                 self.assertTrue(result["fresh"])
                 self.assertNotIn("completion", result)

@@ -154,6 +154,9 @@ When neither existing path completes, the adapter accepts only this conjunction:
 5. The summary update is strictly after check completion. A baseline summary must have
    a changed body and a baseline timestamp at or before the request. Its positive review
    counter must advance from the parsed baseline counter, including same-SHA retries.
+   An existing summary requires a successfully parsed baseline binding with a positive
+   integer counter: missing, null or malformed bindings fail closed. Counter equality,
+   decrease, missing values and invalid types cannot establish advancement.
    If no summary existed in the baseline, its creation must be after the request.
 6. Check and summary times must fall within the ticket's original timeout and no later
    than the snapshot. The accepted finding window is `(requested_at,
@@ -182,8 +185,9 @@ proof of causality. Keep raw snapshots and request responses for review.
 
 ### Release compatibility
 
-This completion-path addition requires a new skill release; do not replace or retag
-v0.1.0. Schema version 1, legacy completion paths, source-key hashing, evidence envelopes,
+This completion-path addition and baseline-integrity correction require a new skill
+release. The expected version after independent acceptance is v0.1.2; do not replace
+or retag v0.1.0 or v0.1.1. Schema version 1, legacy completion paths, source-key hashing, evidence envelopes,
 Chief adjudication and strongest positive output remain unchanged. New freshness metadata
 and baseline fields are additive. The explicit three-review ceiling also closes the prior
 configuration loophole allowing larger caps. No release, installation or tag is produced

@@ -93,14 +93,19 @@ def greptile_completion(snapshot, ticket, cfg, latest_checks):
     if not completed < updated <= min(deadline, collected):
         return None
     previous = ticket["baseline"].get(summary["id"])
-    if previous:
-        if (not previous.get("updated_at") or timestamp(previous["updated_at"]) > boundary or
+    if summary["id"] in ticket["baseline"]:
+        if (not isinstance(previous, dict) or not previous.get("updated_at") or
+                timestamp(previous["updated_at"]) > boundary or
                 previous["digest"] == digest(summary["body"])):
             return None
         prior_binding = previous.get("greptile_summary")
         # New tickets record the review counter: unrelated edits cannot replay a result.
-        # Older tickets lack that observation and need a new, properly captured request.
-        if "greptile_summary" not in previous or (prior_binding and binding["reviews"] <= prior_binding["reviews"]):
+        # Missing or unparseable observations cannot prove counter advancement.
+        if (not isinstance(prior_binding, dict) or
+                type(prior_binding.get("reviews")) is not int or prior_binding["reviews"] <= 0 or
+                not isinstance(prior_binding.get("sha"), str) or
+                not re.fullmatch(r"[0-9a-f]{40}", prior_binding["sha"]) or
+                binding["reviews"] <= prior_binding["reviews"]):
             return None
     elif not summary["created_at"] or not boundary < timestamp(summary["created_at"]) <= updated:
         return None
