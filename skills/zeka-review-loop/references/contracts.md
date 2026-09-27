@@ -30,6 +30,13 @@ An empty finding list needs an explicit no-findings rationale. Historical commen
 must be accounted for too. Complete source coverage is checked mechanically; correctness
 of the natural-language assessment remains the agent's responsibility.
 
+For stock Greptile check-plus-summary completion, `freshness.fresh_source_keys` is the
+accepted current-review subset of this lossless inventory. New finding provenance must
+belong to that subset; historical comments cannot become new findings by being collected
+again. Previously recorded findings and source keys remain mandatory ledger history.
+See [execution.md](execution.md#stock-greptile-check-plus-summary) for the bounded window,
+provider identity, baseline and exact-SHA rules. Legacy marker/native paths are unchanged.
+
 ## Finding contract
 
 ```json
