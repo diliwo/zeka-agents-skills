@@ -4,6 +4,12 @@ Engineering skills developed while building Zeka with coding agents.
 
 ## Skills
 
+- [zeka-ui-evidence](skills/zeka-ui-evidence/SKILL.md): local visual before/after
+  evidence with explicit sources, viewport/component metadata, assertion review and
+  optional evidence-gate export. Reuses configured installed capture tooling; the
+  Python 3.10+ helper packages reviewed PNGs without capturing or publishing.
+  See its [execution reference](skills/zeka-ui-evidence/references/execution.md).
+
 - [zeka-pr-state](skills/zeka-pr-state/SKILL.md): standalone, read-only Git/GitHub
   observations, explicit expectations, exact-revision verification, ancestry and
   structural snapshot comparison. Keeps PR head, live branch and cached tracking
