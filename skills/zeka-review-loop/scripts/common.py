@@ -61,6 +61,7 @@ def config(data):
               "remote": "origin", "allow_unavailable_checks": False, **data}
     for key in ("max_iterations", "timeout_seconds", "poll_seconds"):
         require(type(result[key]) is int and result[key] > 0, key + " must be positive")
+    require(result["max_iterations"] <= 3, "maximum three review iterations")
     require(result["poll_seconds"] <= 60, "poll interval must be at most 60 seconds")
     require(type(result["allow_unavailable_checks"]) is bool, "invalid check availability policy")
     return result

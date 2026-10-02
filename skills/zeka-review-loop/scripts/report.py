@@ -34,6 +34,10 @@ def build(run):
         require(set(previous).issubset(current), "previous findings disappeared from ledger")
         for finding in findings:
             require(set(finding["source_keys"]).issubset(known_sources), "unknown finding provenance")
+            if "completion" in fresh:
+                retained = set(previous.get(finding["id"], {}).get("source_keys", []))
+                require((set(finding["source_keys"]) - retained).issubset(fresh["fresh_source_keys"]),
+                        "new finding provenance is outside accepted review window")
             if finding["id"] in previous:
                 require(set(previous[finding["id"]]["source_keys"]).issubset(finding["source_keys"]),
                         "finding provenance was removed")

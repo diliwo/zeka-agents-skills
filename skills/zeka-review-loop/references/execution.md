@@ -39,9 +39,9 @@ empirically proven convergence threshold: it leaves room to catch defects introd
 revealed by the first correction while bounding external review latency, cost, and repeated
 rework. Stop earlier when ready or when a mandatory stop applies. At the cap, hand off
 remaining findings; never apply another correction without a reserved verification review
-or treat budget exhaustion as readiness. Set a different cap when establishing the bounded
-task if the authorized scope warrants it; do not reset the ledger or silently increase the
-cap to keep a stalled loop running.
+or treat budget exhaustion as readiness. A bounded task may lower the cap to one or two;
+the helper rejects caps above three. Do not reset the ledger or increase the cap to keep
+a stalled loop running.
 
 `apps_trigger` may be set to `@greptile-apps review` only after confirming that this
 installation supports it. Size-limit detection examines trusted review comments/check
@@ -106,7 +106,9 @@ An unexpected external head/base change stops this run; Chief establishes a new 
 
 Tickets contain immutable repository/PR/branch/head-repository/base/head identity,
 server request timestamp, trigger URL/ID, mode, and a pre-request baseline of source
-IDs, body hashes and timestamps. For an already triggered review, retain the original
+IDs, body hashes and timestamps. New baselines also record parsed Greptile review counts
+and last-reviewed SHAs (or null when the supported footer is absent).
+For an already triggered review, retain the original
 ticket; simply observing a score now does not create a valid ticket retroactively.
 
 A native submitted GitHub review must have `commit_id == head_sha`, a submitted
@@ -118,11 +120,78 @@ provider/adapter must emit this marker as a completion assertion:
 ```
 
 This is this skill's adapter contract, **not a claim that stock Greptile emits the marker**.
-Never append the marker locally to make a summary pass. Obtain provider-backed exact-head
-metadata through a configured trusted adapter, or fail closed and ask Chief for the
-missing review evidence. No-check large-PR polling works when that contract is available.
-Otherwise timestamp-only Apps results remain insufficient. Native GitHub review
-submissions need no marker. Seconds-resolution timestamp ties are conservatively rejected.
+Never append the marker locally to make a summary pass. Native GitHub review submissions
+need no marker. Both existing paths retain precedence and their original semantics.
+No-check large-PR polling still requires one of those paths; timestamp-only Apps results
+remain insufficient. Seconds-resolution request timestamp ties are rejected.
+
+### Stock Greptile check plus summary
+
+When neither existing path completes, the adapter accepts only this conjunction:
+
+1. The ticket has a positive integer trigger ID, its matching GitHub PR comment URL,
+   normal/Apps mode, server request time, and the captured pre-request baseline.
+   Snapshot repository, PR, branch, head repository, base and full head SHA still match.
+2. Both `greptile-apps` and `greptile-apps[bot]` are in the configured exact identity
+   allowlists. Only that app's `Greptile Review` check and that bot's summary qualify.
+   Generic GitHub checks cannot opt in by merely adding their slug to the allowlist.
+3. The latest check for that app/name has the exact requested `head_sha`, status
+   `completed`, conclusion `success`, and an ID absent from the baseline. Its start
+   is strictly after the request and no later than its completion. Reused checks,
+   pre-request starts, missing times, neutral/skipped/failure/cancelled/timed-out
+   results cannot establish this path. Pending/failed trusted checks still veto readiness.
+4. Exactly one provider summary comment contains `<!-- greptile_summary -->`. Its
+   terminal footer has the stock form below, with a single `Last reviewed commit:`
+   declaration and a full lowercase 40-character SHA in a GitHub commit URL for the
+   PR head repository. The URL's SHA must equal the requested SHA. Link text, incidental
+   SHAs elsewhere in prose, confidence, file counts and zero-comment claims do not bind
+   completion. Duplicate summaries, ambiguous declarations and unknown formats fail closed.
+
+   ```text
+   <sub>Reviews (N) · Last reviewed commit: ["COMMIT TITLE"](https://github.com/HEAD_OWNER/HEAD_REPOSITORY/commit/FULL_SHA)</sub>
+   ```
+
+5. The summary update is strictly after check completion. A baseline summary must have
+   a changed body and a baseline timestamp at or before the request. Its positive review
+   counter must advance from the parsed baseline counter, including same-SHA retries.
+   An existing summary requires a successfully parsed baseline binding with a positive
+   integer counter: missing, null or malformed bindings fail closed. Counter equality,
+   decrease, missing values and invalid types cannot establish advancement.
+   If no summary existed in the baseline, its creation must be after the request.
+6. Check and summary times must fall within the ticket's original timeout and no later
+   than the snapshot. The accepted finding window is `(requested_at,
+   min(collected_at, requested_at + timeout_seconds)]`; later recaptures cannot extend it.
+
+This conservative path deliberately rejects a pre-request check that finishes afterward,
+a reused check ID, and a summary tied to the same second as check completion. Unsupported
+provider formats need a tested adapter update, not a permissive SHA search.
+
+Freshness output adds `completion` with the request, check, summary and exact-SHA
+references, and `fresh_source_keys` for eligible finding provenance. The raw inventory
+remains lossless for auditing: historical comments still require coverage, but are not
+fresh findings. Newly introduced finding source keys must come from the accepted window;
+unchanged baseline bodies, old-SHA sources and historical comments edited after the request
+are excluded. Fresh inline comments require the exact commit ID. Previously recorded
+findings and their provenance remain in the ledger and cannot disappear.
+
+Existing tickets without the parsed summary baseline remain valid for marker/native
+completion, but cannot retrospectively establish this new path for an existing summary.
+Do not synthesize the missing baseline or restart an expired ticket. A newly authorized
+request must retain the existing run budget; at the cap, stop and hand off.
+
+The ticket and provider timestamps correlate independent observations; stock Greptile
+does not echo the trigger ID. These artifacts are auditable evidence, not cryptographic
+proof of causality. Keep raw snapshots and request responses for review.
+
+### Release compatibility
+
+This completion-path addition and baseline-integrity correction require a new skill
+release. The expected version after independent acceptance is v0.1.2; do not replace
+or retag v0.1.0 or v0.1.1. Schema version 1, legacy completion paths, source-key hashing, evidence envelopes,
+Chief adjudication and strongest positive output remain unchanged. New freshness metadata
+and baseline fields are additive. The explicit three-review ceiling also closes the prior
+configuration loophole allowing larger caps. No release, installation or tag is produced
+by implementing this change; the immutable implementation commit is the review checkpoint.
 
 Check output is collected for findings and failures but never alone proves comments are
 complete. Trustworthy summaries must change after the baseline and request; a reused old
