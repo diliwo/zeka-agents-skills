@@ -25,6 +25,32 @@ the selected PR; it does not authorize unrelated messages, expanded implementati
 scope, branch changes, or merging. Honor stricter session limits. The helper's `--send`
 flag is an explicit mutation switch, not proof of authorization.
 
+## Routine engineering before PR review
+
+Apply the accepted **Standing bounded engineering autonomy** section of
+`Agentic Engineering Governance.md` (Ubongo commit
+`ab77587ec4a5ce4fcba85c25fb4aaca8aea0b7a0`). This section is operational
+guidance, not a new grant of authority. Within an already-approved assignment's
+files, behavior, acceptance criteria and security boundaries, the implementation
+owner may repair routine editing, compiler, test and local-harness failures and
+repeat affected local validation without another owner approval. Preserve each
+failed attempt and the immutable source identity; repeat a diagnostic only after
+a changed hypothesis, corrected execution condition or meaningful new evidence.
+
+These pre-review corrections are not PR review findings: do not invent ledger
+findings, Chief dispositions or review iterations for them. A genuinely new
+nontrivial investigation has the governance default of two bounded diagnostic
+cycles, separate from this skill's unchanged limit of three **review** iterations.
+
+Stop when assignment authority is unclear, a mandatory security check fails,
+or further investigation makes no meaningful progress. Changes to architecture,
+security policy, approved file or behavior scope, credentials, permissions,
+mandatory gates, publication authority or deployment need their existing
+approvals. Once a formal PR review finding exists, its Chief disposition and
+adjudication rules below remain mandatory. Continue using `zeka-pr-state` for
+revision/drift checks and `zeka-evidence-gate` for evidence completeness; neither
+this guidance nor a passing local command substitutes for Chief's final review.
+
 ## Execute the loop
 
 1. Capture an immutable snapshot. Require a clean worktree, matching local branch/HEAD
